@@ -10,10 +10,7 @@ client.once(Events.ClientReady, b => {
 client.on(Events.TypingStart, typing => console.log(`${typing.user.tag} started typing in #${typing.channel.name}`));
 
 const { exec } = require('child_process');
-
-
-const { exec } = require('child_process');
-
+const fs = require('fs')
 client.on('message', async (message) => {
   if (message.content.startsWith('!decrypt')) {
     const args = message.content.split(' ');
@@ -43,7 +40,5 @@ client.on('message', async (message) => {
     });
   }
 });
-
-
 
 client.login(token);
