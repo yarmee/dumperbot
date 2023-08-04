@@ -12,6 +12,8 @@ client.on(Events.TypingStart, typing => console.log(`${typing.user.tag} started 
 const { exec } = require('child_process');
 
 
+const { exec } = require('child_process');
+
 client.on('message', async (message) => {
   if (message.content.startsWith('!decrypt')) {
     const args = message.content.split(' ');
@@ -21,17 +23,27 @@ client.on('message', async (message) => {
     }
     const filename = args[1];
 
-    exec(`python3 decrypt.py ${filename}`, (error, stdout, stderr) => {
-      if (error) {
-        console.error('Error executing the Python script:', error);
-        message.channel.send('An error occurred while decrypting the file.');
+    // Read the file content
+    fs.readFile(filename, 'utf8', (err, fileContent) => {
+      if (err) {
+        console.error('Error reading the file:', err);
+        message.channel.send('An error occurred while reading the file.');
         return;
       }
-      // Send the output of the python script.
-      message.channel.send('Here is the webhook:\n```' + stdout + '```');
+
+      exec(`echo "${fileContent}" | python3 decrypt.py`, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Error executing the Python script:', error);
+          message.channel.send('An error occurred while decrypting the file.');
+          return;
+        }
+        // Send the output of the python script.
+        message.channel.send('Here is the webhook:\n```' + stdout + '```');
+      });
     });
   }
 });
+
 
 
 client.login(token);
