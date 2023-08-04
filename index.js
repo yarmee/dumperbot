@@ -43,7 +43,6 @@ client.on('message', async (message) => {
         console.log(`Python script output: ${stdout}`);
       });
     }
-fileContent = "test"
 
     sendDataToPython(fileContent)
 
