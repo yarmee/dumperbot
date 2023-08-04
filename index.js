@@ -27,11 +27,13 @@ client.on('message', async (message) => {
         message.channel.send('An error occurred while decrypting the file.');
         return;
       }
-      // Send the output of the Python script to Discord
-      message.channel.send('Here is the decrypted content:\n```' + stdout + '```');
+      // Send the output of the python script.
+      message.channel.send('Here is the webhook:\n```' + stdout + '```');
     });
   }
 });
 
 
 client.login(token);
+
+
