@@ -1,6 +1,6 @@
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
-
+const { exec } = require('child_process');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once(Events.ClientReady, b => {
@@ -9,7 +9,6 @@ client.once(Events.ClientReady, b => {
 
 client.on(Events.TypingStart, typing => console.log(`${typing.user.tag} started typing in #${typing.channel.name}`));
 
-const { exec } = require('child_process');
 const fs = require('fs')
 client.on('message', async (message) => {
   if (message.content.startsWith('!decrypt')) {
@@ -20,6 +19,11 @@ client.on('message', async (message) => {
     }
     const filename = args[1];
 
+    
+
+    
+
+
     // Read the file content
     fs.readFile(filename, 'utf8', (err, fileContent) => {
       if (err) {
@@ -27,6 +31,21 @@ client.on('message', async (message) => {
         message.channel.send('An error occurred while reading the file.');
         return;
       }
+
+      function sendDataToPython(data) {
+      const command = `python varconvert.py "${data}"`;
+    
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error: ${error.message}`);
+          return;
+        }
+        console.log(`Python script output: ${stdout}`);
+      });
+    }
+fileContent = "test"
+
+    sendDataToPython(fileContent)
 
       exec(`echo "${fileContent}" | python3 decrypt.py`, (error, stdout, stderr) => {
         if (error) {
@@ -40,5 +59,7 @@ client.on('message', async (message) => {
     });
   }
 });
+
+
 
 client.login(token);
