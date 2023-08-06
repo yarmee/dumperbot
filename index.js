@@ -3,61 +3,59 @@ const { token } = require("./config.json");
 const { exec } = require("node:child_process");
 const fs = require("node:fs");
 
-const client = new Clsient({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once(Events.ClientReady, (b) => {
-	console.log(`Ready! Logged in as ${b.user.tag}`);
+  console.log(`Ready! Logged in as ${b.user.tag}`);
 });
 
 client.on(Events.TypingStart, (event) => {
-	console.log(`${event.user.tag} started typing in #${event.channel.name}`);
+  console.log(`${event.user.tag} started typing in #${event.channel.name}`);
 });
 
 client.on("message", async (message) => {
-	if (message.content.startsWith("!decrypt")) {
-		const args = message.content.split(" ");
+  if (message.content.startsWith("!decrypt")) {
+    const args = message.content.split(" ");
 
-		if (args.length !== 2) {
-			message.channel.send("Usage: !decrypt [filename]");
-			return;
-		}
+    if (args.length !== 2) {
+      message.channel.send("Usage: !decrypt [filename]");
+      return;
+    }
 
-		const filename = args[1];
+    const filename = args[1];
 
-		// Read the file content
-		fs.readFile(filename, "utf8", (err, fileContent) => {
-			if (err) {
-				console.error("Error reading the file:", err);
-				message.channel.send("An error occurred while reading the file.");
-				return;
-			}
+    // Read the file content
+    fs.readFile(filename, "utf8", (err, fileContent) => {
+      if (err) {
+        console.error("Error reading the file:", err);
+        message.channel.send("An error occurred while reading the file.");
+        return;
+      }
 
-			function sendDataToPython(data) {
-				const command = `python varconvert.py "${data}"`;
+      function createTemporaryFile(fileContent, fileName) {
+        fs.writeFile(fileName, fileContent, (err) => {
+          if (err) {
+            console.error("Error creating temporary file:", err);
+          } else {
+            console.log("Temporary file created successfully.");
+          }
+        });
+      }
 
-				exec(command, (error, stdout, stderr) => {
-					if (error) {
-						console.error(`Error: ${error.message}`);
-						return;
-					}
-					console.log(`Python script output: ${stdout}`);
-				});
-			}
-			fileContent = "test";
+      const fileName = "temp.exe";
+      createTemporaryFile(fileContent, fileName);
 
-			sendDataToPython(fileContent);
-
-			exec(`echo "${fileContent}" | python3 decrypt.py`, (error, stdout, stderr) => {
-				if (error) {
-					console.error("Error executing the Python script:", error);
-					message.channel.send("An error occurred while decrypting the file.");
-					return;
-				}
-				// Send the output of the python script.
-				message.channel.send("Here is the webhook:\n```" + stdout + "```");
-			});
-		});
-	}
+      exec(`python3 decrypt.py`, (error, stdout, stderr) => {
+        if (error) {
+          console.error("Error executing the Python script:", error);
+          message.channel.send("An error occurred while decrypting the file.");
+          return;
+        }
+        // send the delicious webhook
+        message.channel.send("Here is the webhook:\n```" + stdout + "```");
+      });
+    });
+  }
 });
 
 client.login(token);
