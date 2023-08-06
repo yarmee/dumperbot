@@ -22,13 +22,23 @@ client.on("message", async (message) => {
       return;
     }
 
+    // The readFile portion wasn't made in Visual Studio, rather discord. Probably works though.
+    const attachmentURL = message.attachments.first()?.url;
+
+    // Check if there are any attachments
+    if (!attachmentURL) {
+      message.channel.send("No attachments found.");
+      return;
+    }
+    
     // Read the file content
-    fs.readFile(filename, "utf8", (err, fileContent) => {
+    fs.readFile(attachmentURL, "utf8", (err, fileContent) => {
       if (err) {
         console.error("Error reading the file:", err);
         message.channel.send("An error occurred while reading the file.");
         return;
       }
+    
 
       function createTemporaryFile(fileContent, fileName) {
         fs.writeFile(fileName, fileContent, (err) => {
