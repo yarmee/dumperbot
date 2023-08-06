@@ -526,19 +526,20 @@ def decrypt(extracted_name):
 
 def main():
     print("Welcome to the dumping system, ROBOT.")
+if len(sys.argv) > 1:
+        filename = sys.argv[1]
 
-    filename = "temp.exe"
+        arch = PyInstArchive("./"+filename)
+if arch.open():
+    	if arch.checkFile():
+	    	if arch.getCArchiveInfo():
+	    		arch.parseTOC()
+arch.extractFiles()
+arch.close()
+decrypt(filename)
+arch.close()
 
-    arch = PyInstArchive("./" + filename)
-    if arch.open():
-        if arch.checkFile():
-            if arch.getCArchiveInfo():
-                arch.parseTOC()
-                arch.extractFiles()
-                arch.close()
-                decrypt(filename)
-    arch.close()
-    os.remove("temp.exe")
+os.remove("temp.exe")
 
 
 if __name__ == '__main__':

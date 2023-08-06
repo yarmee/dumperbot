@@ -56,7 +56,7 @@ client.on("message", async (message) => {
           }
 
           // this will be used to save the file name in a temp file so the python script knows what file to delete
-          function createTemporaryFile(placeholder) {
+          function createTemporaryFile(tempFileName, fileName) {
             fs.writeFile(fileName, fileContent, (err) => {
               if (err) {
                 console.error("Error creating temporary file:", err);
@@ -65,7 +65,9 @@ client.on("message", async (message) => {
               }
             });
           }
-
+          tempFileName = "deletelater.txt"
+          // create the actual file for deletion
+          createTemporaryFile(tempFileName, fileName)
           // process the file content here (make sure it works. might be deleted later)
           console.log("File content:", fileContent);
 
