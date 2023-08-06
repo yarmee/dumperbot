@@ -18,7 +18,7 @@ client.on("message", async (message) => {
     const args = message.content.split(" ");
 
     if (args.length !== 2) {
-      message.channel.send("Usage: !decrypt [filename]");
+      message.channel.send("Usage: !decrypt [attach the file]");
       return;
     }
 
