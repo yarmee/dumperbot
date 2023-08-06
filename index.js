@@ -22,8 +22,6 @@ client.on("message", async (message) => {
       return;
     }
 
-    const filename = args[1];
-
     // Read the file content
     fs.readFile(filename, "utf8", (err, fileContent) => {
       if (err) {
