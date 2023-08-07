@@ -15,7 +15,8 @@ import os
 import shutil
 import binascii
 
-filename = "temp.exe"
+filename = "grabber.exe"
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -392,7 +393,7 @@ def zlibDecompress(in_file, out_file):
             print("[BLANK-FUCKER] Zlib not detected!")
 
 
-def deobfuscate(pyfile, preLoader=False, path="", file_name="grabber"):
+def deobfuscate(pyfile, preLoader=False, path=""):
     print("[BLANK-FUCKER]"+bcolors.WARNING +
           " Starting deobfuscation process..."+bcolors.ENDC)
     pyCode = ""
@@ -421,7 +422,7 @@ def deobfuscate(pyfile, preLoader=False, path="", file_name="grabber"):
                 webhook = re.findall(
                     r"(?<=\\x00z\\xa.)(.*?)(?=z\\x..)", byteCode)[0]
             write_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
-            with open(write_path+"/"+file_name+".hook", "w") as f:
+            with open(write_path+"/we_gottem.hook", "w") as f:
                 try:
                     if preLoader == True:
                         f.write(str(webhook).replace(
@@ -431,8 +432,8 @@ def deobfuscate(pyfile, preLoader=False, path="", file_name="grabber"):
                     else:
                         f.write(str(base64.b64decode(webhook)).replace(
                             "b'", "").replace("'", ""))
-                    print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Webhook: "+str(
-                        base64.b64decode(webhook)).replace("b'", "").replace("'", "")+bcolors.ENDC)
+                        print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Webhook: "+str(
+                            base64.b64decode(webhook)).replace("b'", "").replace("'", "")+bcolors.ENDC)
                 except:
                     f.write(str(webhook).replace("b'", "").replace("'", ""))
                     print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Telegram Bot Token: " +
@@ -501,8 +502,8 @@ def decrypt(extracted_name):
                                 print("[BLANK-FUCKER]"+bcolors.WARNING +
                                       " Got LZMA file from bytecode"+bcolors.ENDC)
                                 f.close()
-                            deobfuscate(path+"decrypted.py", preLoader=False,
-                                        path=path, file_name=extracted_name)
+                            deobfuscate(path+"decrypted.py",
+                                        preLoader=False, path=path)
     else:
         print("[BLANK-FUCKER]"+bcolors.WARNING +
               " Payload seems to be an older version of blank grabber, attempting older methods.."+bcolors.ENDC)
@@ -520,26 +521,32 @@ def decrypt(extracted_name):
                         print("[BLANK-FUCKER]"+bcolors.WARNING +
                               " Got LZMA file from bytecode"+bcolors.ENDC)
                         f.close()
-                    deobfuscate(path+"decrypted.py", preLoader=True,
-                                path=path, file_name=extracted_name)
+                    deobfuscate(path+"decrypted.py", preLoader=True, path=path)
 
 
 def main():
-    print("Welcome to the dumping system, ROBOT.")
-if len(sys.argv) > 1:
+    print("""
+    ╭━━╮╭╮╱╱╭━━━┳━╮╱╭┳╮╭━╮╱╭━━━┳╮╱╭┳━━━┳╮╭━┳━━━┳━━━╮
+    ┃╭╮┃┃┃╱╱┃╭━╮┃┃╰╮┃┃┃┃╭╯╱┃╭━━┫┃╱┃┃╭━╮┃┃┃╭┫╭━━┫╭━╮┃
+    ┃╰╯╰┫┃╱╱┃┃╱┃┃╭╮╰╯┃╰╯╯╱╱┃╰━━┫┃╱┃┃┃╱╰┫╰╯╯┃╰━━┫╰━╯┃
+    ┃╭━╮┃┃╱╭┫╰━╯┃┃╰╮┃┃╭╮┣━━┫╭━━┫┃╱┃┃┃╱╭┫╭╮┃┃╭━━┫╭╮╭╯
+    ┃╰━╯┃╰━╯┃╭━╮┃┃╱┃┃┃┃┃╰┳━┫┃╱╱┃╰━╯┃╰━╯┃┃┃╰┫╰━━┫┃┃╰╮
+    ╰━━━┻━━━┻╯╱╰┻╯╱╰━┻╯╰━╯╱╰╯╱╱╰━━━┻━━━┻╯╰━┻━━━┻╯╰━╯""")
+    # get first argument
+    if len(sys.argv) > 1:
         filename = sys.argv[1]
-
-        arch = PyInstArchive("./"+filename)
-if arch.open():
-    	if arch.checkFile():
-	    	if arch.getCArchiveInfo():
-	    		arch.parseTOC()
-arch.extractFiles()
-arch.close()
-decrypt(filename)
-arch.close()
-
-os.remove("temp.exe")
+    else:
+        filename = input("[BLANK-FUCKER]"+bcolors.OKBLUE +
+                         " Please input file name: "+bcolors.ENDC)
+    arch = PyInstArchive("./"+filename)
+    if arch.open():
+        if arch.checkFile():
+            if arch.getCArchiveInfo():
+                arch.parseTOC()
+                arch.extractFiles()
+                arch.close()
+                decrypt(filename)
+    arch.close()
 
 
 if __name__ == '__main__':
