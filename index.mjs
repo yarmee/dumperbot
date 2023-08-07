@@ -1,12 +1,11 @@
 /* eslint-disable no-unused-vars */
-const { Client, Events, GatewayIntentBits } = require("discord.js");
-const { token } = require("./config.json");
-const { spawn } = require("child_process");
-const fs = require("fs");
-const fetch = require("node-fetch");
-const { v4: uuidv4 } = require('uuid');
+import { Client, Events, GatewayIntentBits } from "discord.js";
+import { spawn } from "child_process";
+import fs from "fs";
+import fetch from "node-fetch";
+import { v4 as uuidv4 } from 'uuid';
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages] });
 
 client.once(Events.ClientReady, (b) => {
   console.log(`Ready! Logged in as ${b.user.tag}`);
@@ -16,17 +15,11 @@ client.on(Events.TypingStart, (event) => {
   console.log(`${event.user.tag} started typing in #${event.channel.name}`);
 });
 
-client.on('messageCreate', async (message) => {
+client.on("messageCreate", async (message) => {
   if (message.content.startsWith('!decrypt')) {
-    const requestId = uuidv4(); // I have no idea why I did this but now the code won't work without it 
-    const args = message.content.split(' ');
+    const requestId = uuidv4();
+    console.log('I can see the message');
 
-    if (args.length !== 2) {
-      message.reply('Usage: !decrypt [attach the file]');
-      return;
-    }
-
-    // Make sure the attachment exists
     const attachment = message.attachments.first();
     if (!attachment) {
       message.reply('No attachments found.');
@@ -35,16 +28,22 @@ client.on('messageCreate', async (message) => {
 
     const attachmentURL = attachment.url;
     const fileName = attachment.name;
+   
+    if (!attachment) {
+      message.reply('No attachments found.');
+      return;
+    }
 
     try {
         
       // Download the file from the URL
       const response = await fetch(attachmentURL);
-      const fileBuffer = await response.buffer();
+
+      const fileBuffer = await response.arrayBuffer();
 
       // Save the file temporarily
       const tempFilePath = `./temp/${requestId}_${fileName}`;
-      await fs.writeFile(tempFilePath, fileBuffer);
+      await fs.promises.writeFile(tempFilePath, fileBuffer);
 
       // Rename the temporary file to grabber.exe
       const renamedFilePath = `./temp/grabber.exe`;
@@ -64,6 +63,9 @@ client.on('messageCreate', async (message) => {
           const webhookURL = webhookMatch[1];
           console.log(`Sent: ${webhookURL}`);
           message.channel.send(`Webhook URL: ${webhookURL}`)
+        }
+        if (!webhookMatch) {
+          message.channel.send('A webhook wasn\'t found in this file')
         }
       });
 
@@ -87,4 +89,4 @@ client.on('messageCreate', async (message) => {
     }
   }
 });
-client.login(token);
+client.login("your-bot-token-here");
