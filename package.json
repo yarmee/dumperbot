@@ -1,7 +1,7 @@
 {
   "name": "discord-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is the bot for the blank grabber dumper",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,6 +13,9 @@
   "dependencies": {
     "discord.js": "^14.12.1",
     "node-fetch": "^3.3.2",
+    "node-pty": "^1.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
