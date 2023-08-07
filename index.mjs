@@ -39,15 +39,16 @@ client.on("messageCreate", async (message) => {
       // Download the file from the URL
       const response = await fetch(attachmentURL);
 
-      const fileBuffer = await response.arrayBuffer();
-
+      const arrayBuffer = await response.arrayBuffer();
+      const fileBuffer = Buffer.from(arrayBuffer);
+      
       // Save the file temporarily
       const tempFilePath = `./temp/${requestId}_${fileName}`;
       await fs.promises.writeFile(tempFilePath, fileBuffer);
 
       // Rename the temporary file to grabber.exe
       const renamedFilePath = `./temp/grabber.exe`;
-      await fs.rename(tempFilePath, renamedFilePath);
+      await fs.promises.rename(tempFilePath, renamedFilePath);
 
       // Run the decrypt.py script
       const decryptProcess = spawn('python3', ['./temp/decrypt.py']);
@@ -77,7 +78,7 @@ client.on("messageCreate", async (message) => {
       decryptProcess.on('close', (code) => {
         console.log(`decrypt.py process exited with code ${code}`);
         // Clean up by deleting the temporary file
-        fs.unlink(renamedFilePath)
+        fs.promises.unlink(renamedFilePath)
           .then(() => console.log(`Temporary file ${renamedFilePath} deleted.`))
           .catch((error) => console.error(`Error deleting file: ${error}`));
       });
@@ -89,4 +90,4 @@ client.on("messageCreate", async (message) => {
     }
   }
 });
-client.login("your-bot-token-here");
+client.login("your-bot-token");
