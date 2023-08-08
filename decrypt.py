@@ -364,7 +364,7 @@ class PyInstArchive:
 
 def assemblyOfFile(path):
     result = subprocess.run(
-        ['/Users/user/Documents/Projects/Blanc-Reverser/pycdas', path], stdout=subprocess.PIPE)
+        ['/Users/yarmee/Desktop/discord-bot/pycdas', path], stdout=subprocess.PIPE)
     return result.stdout
 
 
@@ -444,7 +444,7 @@ def deobfuscate(pyfile, preLoader=False, path=""):
 
 
 def decrypt(extracted_name):
-    path = "/Users/user/Documents/Projects/Blanc-Reverser/"+extracted_name+"_extracted/"
+    path = "/Users/yarmee/Desktop/discord-bot/"+extracted_name+"_extracted/"
     mainStub = path+"/blank.aes"
     preObscurity = os.path.exists(mainStub)
     if preObscurity:
