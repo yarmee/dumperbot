@@ -3,33 +3,28 @@ const { Client, Events, GatewayIntentBits } = require("discord.js");
 const { token } = require("./config.json");
 const { spawn } = require("child_process");
 const fs = require("fs");
-const fetch = require("node-fetch");
-const { MessageAttachment } = require("discord.js");
 const { v4: uuidv4 } = require("uuid");
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
 
 client.once(Events.ClientReady, (b) => {
   console.log(`Ready! Logged in as ${b.user.tag}`);
 });
 
-client.on("messageCreate", async (message) => {
-  if (message.author.bot) {
-    return;
-  }
-  if (message.content.startsWith("!decrypt")) {
-    const requestId = uuidv4(); // Generate a new UUID for each request
-    const args = message.content.split(" ");
+client.on('messageCreate', async (message) => {
+  if (message.content.startsWith('!decrypt')) {
+    const requestId = uuidv4(); // I have no idea why I did this but now the code won't work without it 
+    const args = message.content.split(' ');
 
     if (args.length !== 2) {
-      message.reply("Usage: !decrypt [attach the file]");
+      message.reply('Usage: !decrypt [attach the file]');
       return;
     }
 
     // Make sure the attachment exists
     const attachment = message.attachments.first();
     if (!attachment) {
-      message.reply("No attachments found.");
+      message.reply('No attachments found.');
       return;
     }
 
@@ -61,6 +56,7 @@ client.on("messageCreate", async (message) => {
         if (webhookMatch) {
           const webhookURL = webhookMatch[1];
           console.log(`Webhook URL: ${webhookURL}`);
+          message.channel.send(`Webhook: ${webhookURL}`)
         }
       });
 
