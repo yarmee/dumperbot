@@ -5,20 +5,26 @@ const { spawn } = require("child_process");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 
 client.once(Events.ClientReady, (b) => {
   console.log(`Ready! Logged in as ${b.user.tag}`);
 });
 
-client.on('messageCreate', async (message) => {
-  if (message.content.startsWith('!decrypt')) {
+client.on("messageCreate", async (message) => {
+  if (message.content.startsWith("!decrypt")) {
     const requestId = uuidv4(); // I have no idea why I did this but now the code won't work without it
 
     // Make sure the attachment exists
     const attachment = message.attachments.first();
     if (!attachment) {
-      message.reply('No attachments found.');
+      message.reply("No attachments found.");
       return;
     }
 
@@ -34,10 +40,8 @@ client.on('messageCreate', async (message) => {
       // Save the file temporarily
       const tempFilePath = `./${requestId}_${fileName}`;
       await fs.promises.writeFile(tempFilePath, fileBuffer);
-      const renamedFilePath = `./grabber.exe`;
-      fs.promises.rename(tempFilePath, renamedFilePath)
       // Run the decrypt.py script
-      const decryptProcess = spawn("python3", ["decrypt.py", "grabber.exe"]);
+      const decryptProcess = spawn("python3", ["decrypt.py", tempFilePath]);
 
       decryptProcess.stdout.on("data", (data) => {
         const output = data.toString();
@@ -50,25 +54,26 @@ client.on('messageCreate', async (message) => {
         if (webhookMatch) {
           const webhookURL = webhookMatch[0];
           console.log(`Webhook URL: ${webhookURL}`);
-          message.channel.send(`Webhook: ${webhookURL}`)
+          message.channel.send(`Webhook: ${webhookURL}`);
         }
       });
 
       decryptProcess.stderr.on("data", (data) => {
         console.error(`decrypt.py error: ${data}`);
-        // Handle errors if needed
+        fs.promises.unlink(tempFilePath);
       });
 
       decryptProcess.on("close", async (code) => {
         console.log(`decrypt.py process exited with code ${code}`);
-        
+
         try {
-          await fs.promises.unlink(renamedFilePath);
-          console.log(`Temporary file ${renamedFilePath} deleted.`);
+          await fs.promises.unlink(tempFilePath);
+          await fs.promises.unlink("./we_gottem.hook");
+          console.log(`Temporary file ${tempFilePath} deleted.`);
         } catch (error) {
-          console.error(`Error deleting file: ${error}`);
+          console.error(`Error deleting file(s): ${error}`);
         }
-      });           
+      });
 
       message.reply("File decryption process initiated.");
     } catch (error) {
