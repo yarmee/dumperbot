@@ -19,7 +19,7 @@ client.once(Events.ClientReady, (b) => {
 
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!decrypt")) {
-    const requestId = uuidv4(); // I have no idea why I did this but now the code won't work without it
+    const requestId = uuidv4(); // personalize each request
 
     // Make sure the attachment exists
     const attachment = message.attachments.first();
